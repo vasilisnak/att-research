@@ -1,0 +1,14 @@
+module random[seed in Int]
+	def max_int64 = uint[64, 9223372036854775807]
+
+	def uniform[i in Int] = random_threefry_float64[seed, i]
+
+	def integers[i in Int, n in Int] =
+		modulo[truncated, n] + 1,
+		r = random_threefry_uint64[seed, i]
+		and truncated = int64[modulo[r, max_int64]]
+		from truncated, r
+
+	@outline
+	def choice[i, L] = sort[L][integers[i, count[L]]]
+end

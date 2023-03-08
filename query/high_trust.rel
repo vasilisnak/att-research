@@ -1,0 +1,40 @@
+@inline
+def rng = random[0]
+
+def eps = 0.1
+def G = {
+	1, 1;
+	2, 1;
+	2, 3;
+	1, 3;
+	1, 4;
+}
+
+def m = count[G]
+def node(n) = G(n, _) or G(_, n)
+def degree[n in node] = count[G[n]]
+
+def neighbor_pair(n, u, v) = G(n, u) and G(n, v) and u < v
+
+def n_samples[n in node] = floor_to_int[5 * degree[n] * log[2, m] / eps]
+
+def n_neighbor_edges[n in node] = count[u, v:
+	rng:choice[i, neighbor_pair[n]](u, v)
+	and G(u, v)
+	for i in range[1, n_samples[n], 1]
+]
+
+def high_trust[n in node] = int_float_convert[n_neighbor_edges[n]] >= log[2, m]
+
+// this is the same as `high_trust` but without exposing the intermediate relations;
+// it has the advantage of not polluting the namespace, but it's arguably less readable
+// and probably less performant
+def high_trust_compact(n in node) =
+	n_neighbor_edges = count[u, v:
+		rng:choice[i, neighbor_pair[n]](u, v)
+		and G(u, v)
+		for i in range[1, n_samples, 1]
+	]
+	and n_samples = floor_to_int[5 * degree[n] * log[2, m] / eps]
+	and int_float_convert[n_neighbor_edges] >= log[2, m]
+	from n_neighbor_edges in Int, n_samples in Int
