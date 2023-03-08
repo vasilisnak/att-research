@@ -9,6 +9,7 @@ module random[seed in Int]
 		and truncated = int64[modulo[r, max_int64]]
 		from truncated, r
 
+	doc"""Gives the `ith` random sample with replacement from the relation R"""
 	@outline
-	def choice[i, L] = sort[L][integers[i, count[L]]]
+	def choice[i, R] = sort[R][integers[i, count[R]]]
 end
